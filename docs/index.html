@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>Restitution Numérique - Cathédrale de Lausanne</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+
+    <!-- Icônes Font Awesome (facultatif) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Model Viewer pour afficher un .glb -->
+    <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #1e3d59;
+            --secondary-color: #ff6e40;
+            --background-light: #f5f5f5;
+            --text-dark: #2c3e50;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: var(--background-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* En-tête simple */
+        .header {
+            text-align: center;
+            padding: 2rem 1rem;
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .header p {
+            font-size: 1rem;
+            margin: 0.5rem 0 0;
+            line-height: 1.4;
+        }
+
+        /* Contenu principal */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Petite introduction avant la grille */
+        .intro {
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+        }
+        .intro h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        /* Grille */
+        .grid-container {
+            display: grid;
+            /* 2 colonnes minimum, s’élargit à 3+ sur grand écran */
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        /* Cartes/Blocs individuels */
+        .item-container {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease;
+        }
+        .item-container:hover {
+            transform: translateY(-5px);
+        }
+
+        .item-title {
+            padding: 1rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .item-content {
+            position: relative;
+            padding: 1rem;
+            aspect-ratio: 4 / 3;
+        }
+
+        /* Images */
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            cursor: zoom-in;
+            transition: opacity 0.3s ease;
+        }
+        img:hover {
+            opacity: 0.9;
+        }
+
+        /* Model Viewer */
+        model-viewer {
+            width: 100%;
+            height: 100%;
+            background: #fafafa;
+            --poster-color: transparent;
+        }
+
+        /* Modal pour zoom images */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal.active {
+            display: flex;
+            opacity: 1;
+        }
+        .modal-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90vh;
+            margin: auto;
+        }
+        .modal-image {
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+        }
+        .close-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+        .close-button:hover {
+            background: var(--secondary-color);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* Pied de page */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background: var(--primary-color);
+            color: white;
+            margin-top: 4rem;
+        }
+        footer p {
+            margin: 0.25rem 0;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- En-tête -->
+    <div class="header">
+        <h1>Restitution Numérique</h1>
+        <p>Cathédrale de Lausanne — Statues-colonnes du narthex</p>
+    </div>
+
+    <!-- Conteneur principal -->
+    <div class="container">
+        <!-- Introduction courte -->
+        <div class="intro">
+            <h2>Présentation du projet</h2>
+            <p>
+                Dans le cadre du 750ème anniversaire de Notre Dame de Lausanne, ce site expose
+                les différentes étapes de la reconstitution numérique de statues-colonnes disparues.
+                Les visages perdus retrouvent vie grâce à l’IA générative d’images.
+            </p>
+            <p>
+                Travail réalisé par <strong>Alexis Allemand, Zheng Dang et Mathieu Salzmann</strong>
+                du <em>CVLab – EPFL</em>. Contact : 
+                <a href="mailto:r.bugnion@bluewin.ch">r.bugnion@bluewin.ch</a>
+            </p>
+        </div>
+
+        <!-- Grille d'items (4 images + 1 modèle 3D) -->
+        <div class="grid-container">
+
+            <!-- 1) Image de référence -->
+            <div class="item-container">
+                <div class="item-title">Image de référence</div>
+                <div class="item-content">
+                    <img src="assets/Pic1.jpg" alt="Référence" class="zoomable">
+                </div>
+            </div>
+
+            <!-- 2) Étape 1 -->
+            <div class="item-container">
+                <div class="item-title">Étape 1</div>
+                <div class="item-content">
+                    <img src="assets/PIC1STEP1.png" alt="Étape 1" class="zoomable">
+                </div>
+            </div>
+
+            <!-- 4) Résultat Final -->
+            <div class="item-container">
+                <div class="item-title">Résultat Final</div>
+                <div class="item-content">
+                    <img src="assets/FinalResult.png" alt="Résultat final" class="zoomable">
+                </div>
+            </div>
+
+            <!-- 5) Modèle 3D -->
+            <div class="item-container">
+                <div class="item-title">Modèle 3D</div>
+                <div class="item-content">
+                    <model-viewer 
+                        src="assets/last_result.glb"
+                        camera-controls 
+                        auto-rotate 
+                        exposure="0.5"
+                        shadow-intensity="2"
+                        camera-orbit="0deg 75deg 110%"
+                        loading="lazy">
+                    </model-viewer>
+                </div>
+            </div>
+
+            <!-- 3) L'Éveillée (à part) -->
+            <div class="item-container">
+                <div class="item-title">L’Éveillée (cachée)</div>
+                <div class="item-content">
+                    <img src="assets/photo Claude Bornand retouchée 2.jpg" alt="L’Éveillée" class="zoomable">
+                </div>
+            </div>
+            <!-- 3) L'Éveillée (à part) -->
+            <div class="item-container">
+                <div class="item-title">L’Éveillée (reconstituée)</div>
+                <div class="item-content">
+                    <img src="assets/photo Claude Bornand retouchée 2 2.jpg" alt="L’Éveillée" class="zoomable">
+                </div>
+            </div>
+
+        </div> <!-- /grid-container -->
+    </div> <!-- /container -->
+
+    <!-- Modale pour zoomer les images -->
+    <div class="modal" id="imageModal">
+        <button class="close-button">&times;</button>
+        <div class="modal-content">
+            <img class="modal-image" src="" alt="Agrandissement">
+        </div>
+    </div>
+
+    <!-- Pied de page -->
+    <footer>
+        <p>
+            © 2025 • Projet de restitution numérique — EPFL, CVLab
+        </p>
+        <p>
+            Par Alexis Allemand, Zheng Dang &amp; Mathieu Salzmann
+        </p>
+    </footer>
+
+    <!-- Script pour l’effet de zoom au clic sur l’image -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.querySelector('.modal-image');
+            const closeButton = modal.querySelector('.close-button');
+            const zoomableImages = document.querySelectorAll('.zoomable');
+
+            function openModal(imageSrc) {
+                modalImage.src = imageSrc;
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeModal() {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+                setTimeout(() => {
+                    modalImage.src = '';
+                }, 300);
+            }
+
+            zoomableImages.forEach(img => {
+                img.addEventListener('click', () => openModal(img.src), { passive: true });
+            });
+
+            closeButton.addEventListener('click', closeModal, { passive: true });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.classList.contains('active')) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
