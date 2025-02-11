@@ -95,6 +95,24 @@
             font-weight: 600;
             background: var(--primary-color);
             color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* pour placer le bouton à droite */
+        }
+
+        /* Bouton "agrandir" / "expand" */
+        .expand-button {
+            background: var(--secondary-color);
+            border: none;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .expand-button:hover {
+            opacity: 0.9;
+            transform: scale(1.1);
         }
 
         .item-content {
@@ -211,7 +229,7 @@
             </p>
         </div>
 
-        <!-- Grille d'items (4 images + 1 modèle 3D) -->
+        <!-- Grille d'items (4 images + 1 modèle 3D + 2 images de "l'Éveillée") -->
         <div class="grid-container">
 
             <!-- 1) Image de référence -->
@@ -238,9 +256,12 @@
                 </div>
             </div>
 
-            <!-- 5) Modèle 3D -->
+            <!-- 5) Modèle 3D : on ajoute un bouton "expand" -->
             <div class="item-container">
-                <div class="item-title">Modèle 3D</div>
+                <div class="item-title">
+                    Modèle 3D
+                    <button class="expand-button"><i class="fas fa-expand"></i></button>
+                </div>
                 <div class="item-content">
                     <model-viewer 
                         src="assets/last_result.glb"
@@ -254,18 +275,19 @@
                 </div>
             </div>
 
-            <!-- 3) L'Éveillée (à part) -->
+            <!-- 3) L'Éveillée (cachée) -->
             <div class="item-container">
                 <div class="item-title">L’Éveillée (cachée)</div>
                 <div class="item-content">
-                    <img src="assets/photo Claude Bornand retouchée 2.jpg" alt="L’Éveillée" class="zoomable">
+                    <img src="assets/photoClaudeBornand.jpg" alt="L’Éveillée" class="zoomable">
                 </div>
             </div>
-            <!-- 3) L'Éveillée (à part) -->
+
+            <!-- 3) L'Éveillée (reconstituée) -->
             <div class="item-container">
                 <div class="item-title">L’Éveillée (reconstituée)</div>
                 <div class="item-content">
-                    <img src="assets/photo Claude Bornand retouchée 2 2.jpg" alt="L’Éveillée" class="zoomable">
+                    <img src="assets/photoClaudeBornandretouchée.jpg" alt="L’Éveillée" class="zoomable">
                 </div>
             </div>
 
@@ -282,28 +304,31 @@
 
     <!-- Pied de page -->
     <footer>
-        <p>
-            © 2025 • Projet de restitution numérique — EPFL, CVLab
-        </p>
-        <p>
-            Par Alexis Allemand, Zheng Dang &amp; Mathieu Salzmann
-        </p>
+        <p>© 2025 • Projet de restitution numérique — EPFL, CVLab</p>
+        <p>Par Alexis Allemand, Zheng Dang &amp; Mathieu Salzmann</p>
     </footer>
 
-    <!-- Script pour l’effet de zoom au clic sur l’image -->
+    <!-- Script pour l’effet de zoom au clic sur l’image + bouton "expand" du modèle -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const modal = document.getElementById('imageModal');
             const modalImage = document.querySelector('.modal-image');
             const closeButton = modal.querySelector('.close-button');
             const zoomableImages = document.querySelectorAll('.zoomable');
+            const expandButtons = document.querySelectorAll('.expand-button');
 
+            /**
+             * Ouvre l'image en grand dans la modale
+             */
             function openModal(imageSrc) {
                 modalImage.src = imageSrc;
                 modal.classList.add('active');
                 document.body.style.overflow = 'hidden';
             }
 
+            /**
+             * Ferme la modale
+             */
             function closeModal() {
                 modal.classList.remove('active');
                 document.body.style.overflow = '';
@@ -312,16 +337,57 @@
                 }, 300);
             }
 
+            /**
+             * Ouvre le modèle 3D dans une nouvelle fenêtre (simulateur "expand")
+             */
+            function expandModel(modelContent) {
+                // Récupère le <model-viewer> et son src
+                const viewer = modelContent.querySelector('model-viewer');
+                const modelSrc = viewer.src;
+
+                // Pour le titre, on récupère le <div class="item-title"> le plus proche
+                const modelTitle = modelContent
+                    .closest('.item-container')
+                    .querySelector('.item-title')
+                    .textContent
+                    .trim();
+
+                // Dimensions de la nouvelle fenêtre
+                const width = Math.floor(window.screen.width * 0.9);
+                const height = Math.floor(window.screen.height * 0.9);
+                const left = Math.floor((window.screen.width - width) / 2);
+                const top = Math.floor((window.screen.height - height) / 2);
+
+                // Ouvre la popup
+                window.open(
+                    `viewer.html?src=${encodeURIComponent(modelSrc)}&title=${encodeURIComponent(modelTitle)}`,
+                    '_blank',
+                    `width=${width},height=${height},top=${top},left=${left}`
+                );
+            }
+
+            // Event: zoom d’images
             zoomableImages.forEach(img => {
                 img.addEventListener('click', () => openModal(img.src), { passive: true });
             });
 
+            // Event: fermer la modale
             closeButton.addEventListener('click', closeModal, { passive: true });
-
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && modal.classList.contains('active')) {
                     closeModal();
                 }
+            });
+
+            // Event: bouton "expand" du modèle 3D
+            expandButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    // On récupère le .item-content juste à côté
+                    const modelContent = e.target
+                        .closest('.item-container')
+                        .querySelector('.item-content');
+                    expandModel(modelContent);
+                }, { passive: true });
             });
         });
     </script>
